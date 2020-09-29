@@ -1,24 +1,36 @@
-# README
+# Subscription-app
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+- create a new rails application named `subscription-app`
 
-Things you may want to cover:
+```console
+rails new subscription-app -d mysql
+```
 
-* Ruby version
+- Enter your application
 
-* System dependencies
+```console
+cd subscription-app
+```
 
-* Configuration
+> If you setup **MySQL** or **Postgres** with a username/password, modify the
+> `config/database.yml` file to contain the username/password that you specified
 
-* Database creation
+- Make sure that MySQL server is running. Just type `mysql`. If you get an error like this:
 
-* Database initialization
+```console
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/run/mysqld/mysqld.sock' (2)
+```
 
-* How to run the test suite
+It's most likely that MySQL server is not running. You can start it with:
 
-* Services (job queues, cache servers, search engines, etc.)
+```console
+sudo service mysql start
+```
 
-* Deployment instructions
+- Generate the database
 
-* ...
+```console
+rake db:migrate
+```
+
+- Open your project in Visual Studio Code. _You can type `explorer.exe .` to open the project on windows (for BashOnUbuntuOnWindows)._
