@@ -81,3 +81,27 @@ Use:
 ## Add Devise
 
 - For instructions on installing Devise go to [getting started](https://github.com/heartcombo/devise#getting-started)
+
+Small recap:
+
+1. `gem 'devise'` in `Gemfile`
+2. `$ bundle install`
+3. `$ rails generate devise:install`
+4. `config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }` in `config/environments/development.rb`
+5. `root to: "home#index"` in `config/routes.rb`
+6. Create and update `home_controller.rb`
+7. Create and update `views/home/index.html.erb`
+8. `rails server` (ensure that mysql server is running)
+9. Update `views/layouts/application.html.erb` to include `<p class="notice"><%= notice %></p>` and `<p class="alert"><%= alert %></p>`
+10. `$ rails generate devise User`
+11. `$ rake db:migrate`
+12. `rails server` if your application is nor running yet
+
+- `http://localhost:3000/users/sign_in` and `http://localhost:3000/users/sign_up` should be available and functional.
+
+## Add navigation
+
+- Add Bootstrap and `<%= render 'nav' %>` in `views/layouts/application.html.erb`
+- Create and update `views/application/_nav.html.erb`
+
+## Add publications
