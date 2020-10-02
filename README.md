@@ -30,7 +30,7 @@ sudo service mysql start
 - Generate the database
 
 ```console
-rake db:migrate
+rake db:create
 ```
 
 - Open your project in Visual Studio Code. _You can type `explorer.exe .` to open the project on windows (for BashOnUbuntuOnWindows)._
@@ -79,3 +79,5 @@ Use:
 | updated_at         | timestamp without time zone |
 
 ## Add Devise
+
+- For instructions on installing Devise go to [getting started](https://github.com/heartcombo/devise#getting-started)
