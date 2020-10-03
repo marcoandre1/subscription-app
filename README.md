@@ -38,12 +38,23 @@ rake db:create
 ## Introducing Devise
 
 - [Devise](https://github.com/heartcombo/devise) provides a number of user [routes](https://rubydoc.info/github/heartcombo/devise/ActionDispatch/Routing/Mapper) automatically.
+- Session routes for **Authenticatable** (default):
 
-Session routes for Authenticatable (default):
+| User/scope                  | Method | Route           | Controller Action        |
+|-----------------------------|--------|-----------------|--------------------------|
+| new_user_session            | GET    | /users/sign_in  | devise/sessions#new      |
+| destroy_user_session        | DELETE | /users/sign_out | devise/sessions#destroy  |
+| new_user_registration       | GET    | /users/sign_up  | devise/registrations#new |
 
-| new_user_session GET        | /users/sign_in  | {controller:"devise/sessions", action:"new"}      |
-| destroy_user_session DELETE | /users/sign_out | {controller:"devise/sessions", action:"destroy"}  |
-| new_user_registration GET   | /users/sign_up  | {controller:"devise/registrations", action:"new"} |
+> For other available routes, look at [SessionsController](https://www.rubydoc.info/github/heartcombo/devise/master/Devise/SessionsController) and [RegistrationsController](https://www.rubydoc.info/github/heartcombo/devise/master/Devise/RegistrationsController)
+
+- [URL helpers](https://www.rubydoc.info/github/heartcombo/devise/master/Devise/Controllers/UrlHelpers) are provided to be used with resource/scope. They act like proxies to the generated routes created by devise. Example:
+
+| User/scope                  | URL helper                 |
+|-----------------------------|----------------------------|
+| new_user_session            | new_user_session_path      |
+| destroy_user_session        | destroy_user_session_path  |
+| new_user_registration       | new_user_registration_path |
 
 - Devise provides a number of user [helpers](https://www.rubydoc.info/github/heartcombo/devise/master/Devise/Controllers/Helpers) automatically.
 
@@ -70,6 +81,8 @@ Use:
 - Devise includes **modules** for additional functionality: Encrypt password, OmniAuth, Email confirmation, Recover password, Lock account, Expire session.
 - Devise configures the [user table](https://rubydoc.info/github/heartcombo/devise/Devise/Models/Authenticatable) with same default columns.
 
+| Name               | Type                        |
+|--------------------|-----------------------------|
 | id                 | integer                     |
 | email              | character varying           |
 | encrypted_password | character varying           |
@@ -91,7 +104,7 @@ Small recap:
 5. `root to: "home#index"` in `config/routes.rb`
 6. Create and update `home_controller.rb`
 7. Create and update `views/home/index.html.erb`
-8. `rails server` (ensure that mysql server is running)
+8. `rails server` (ensure that MySQL server is running)
 9. Update `views/layouts/application.html.erb` to include `<p class="notice"><%= notice %></p>` and `<p class="alert"><%= alert %></p>`
 10. `$ rails generate devise User`
 11. `$ rake db:migrate`
@@ -101,7 +114,77 @@ Small recap:
 
 ## Add navigation
 
-- Add Bootstrap and `<%= render 'nav' %>` in `views/layouts/application.html.erb`
+- Add Bootstrap CDN and `<%= render 'nav' %>` in `views/layouts/application.html.erb`
 - Create and update `views/application/_nav.html.erb`
 
 ## Add publications
+
+- The Publication Model:
+  - The digital file subscribers will have access to
+  - "Lightweight" model as it is not very relevant to implementing payments
+  - Should be customized based on your needs
+- Publication scheme:
+
+| Name               | Type                        |
+|--------------------|-----------------------------|
+| id                 | integer                     |
+| title              | character varying           |
+| file_url           | character varying           |
+| description        | character varying           |
+| created_at         | timestamp without time zone |
+| updated_at         | timestamp without time zone |
+
+- Administrators:
+  - Administrators are users with `is_admin` set to true
+  - A initial administrator will be created, with the option to add more via the console
+  - Many Ruby gems exist for handling administrators : `cancan`, `pundit`, `rolify`
+
+- Administrator and Subscriber views:
+  - Administrators can create, edit, and update publications
+  - Subscribers can only view publications
+  - Non-subscribers can see publications but not access their details
+
+Publication Routes (Admin):
+
+| Method | Route                        | Controller Action          |
+|--------|------------------------------|----------------------------|
+| GET    | /admin/publications          | admin/publications#index   |
+| GET    | /admin/publications/:id      | admin/publications#show    |
+| GET    | /admin/publications/new      | admin/publications#new     |
+| POST   | /admin/publications          | admin/publications#create  |
+| GET    | /admin/publications/:id/edit | admin/publications#edit    |
+| PUT    | /admin/publications/:id      | admin/publications#update  |
+| DELETE | /admin/publications/:id      | admin/publications#destroy |
+
+Publication Routes (Subscriber):
+
+| Method | Route                  | Controller Action          |
+|--------|------------------------|----------------------------|
+| GET    | /publications          | publications#index         |
+| GET    | /publications/:id      | publications#show          |
+
+Publication Routes (Non-subscriber):
+
+| Method | Route                  | Controller Action          |
+|--------|------------------------|----------------------------|
+| GET    | /publications/:id      | publications#show          |
+
+### Create the Publication model
+
+- Create the publication model
+
+```console
+rails g model publication title:string description:text file_url:string
+```
+
+- Migrate the database:
+
+```console
+rake db:migrate
+```
+
+### Add administrators
+
+### Build an administrator view for publications
+
+### Build a subscriber view for publications
