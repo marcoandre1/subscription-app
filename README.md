@@ -251,3 +251,134 @@ User.create(
 - We already did at `localhost:3000/publications`. You can check that everything works fine.
 
 ## Stripe API
+
+### Discuss the payment processor Stripe
+
+- Payment processors:
+
+| PayPal | Authorize.Net | Stripe |
+
+- Why Stripe?
+  - PCI compliance is hard
+  - Powerful API
+  - Low cost
+  - Great support
+
+### Understand Stripe's subscription API
+
+- Stripe's Subscription API
+  - Allows recurring charges on a schedule
+  - Handles storing credit card information
+  - Additional features like coupons and trial periods are also available
+
+### Integrate the Stripe library in our application
+
+- Adding Stripe to Our application
+  - Add the Stripe API gem
+  - Find our Stripe API keys
+  - Use `dotenv` to securely store API keys
+  - Test the API in the console
+
+### Learn how to securely store configuration keys
+
+- Add `dotenv`. A `.env` file can keep the API keys out of the code.
+
+## Add subscriptions
+
+### Build the Subscription model
+
+- Tied to a user
+- `active` boolean
+- Stores Stripe user_id for retrieval
+
+```console
+rails generate model subscription stripe_user_id:string active:boolean user:references
+```
+
+- Update `CreateSubscriptions` migration to ensure boolean can't be null and is false by default:
+
+```ruby
+t.boolean :active, null: false, default: false
+```
+
+- Add the subscription relation to `user.rb` model:
+
+```ruby
+has_one :subscription
+```
+
+- Make sure that the user relation is set in `subscription.rb` model:
+
+```ruby
+belongs_to :user
+```
+
+- Run `rake db:migrate`
+
+- Add an [active record callback](https://guides.rubyonrails.org/active_record_callbacks.html) in the `user.rb` model to generate a default subscription to every new user:
+
+```ruby
+after_create :create_subscription
+def create_subscription
+  Subscription.create(user_id: id) if subscription.nil?
+end
+```
+
+- Add a new migration to ensure previous users also have a subscription:
+
+```console
+rails g migration AddSubscriptionToPreviousUsers
+```
+
+- Update the `AddSubscriptionToPreviousUsers` migration file with the `up` function. More details at [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html):
+
+```ruby
+def up
+  User.all.each do |user|
+    user.create_subscription
+  end
+end
+```
+
+- Run `rake db:migrate`
+
+```console
+rails c
+User.last.subscription
+exit
+```
+
+#### Creating the User info Screen
+
+```console
+rails generate controller users info
+```
+
+```ruby
+get '/users/info', to: 'users#info'
+```
+
+- Update `users_controller.rb`:
+
+```ruby
+before_action :authenticate_user!
+```
+
+- Navigate to `localhost:3000/users/info`
+
+### Accept credit cards using Stripe.js
+
+- Client-side JavaScript library
+- Credit card information never touches our servers
+- A Stripe `token` is used to communicate back and forth
+- Gather credit card information in a form
+- Send it directly to Stripe from the browser
+- Recommended by Stripe
+- Local Subscription model becomes super light-weight
+
+### Tie a subscription to a user with Stripe API
+
+- Using the Stripe token, we create a subscription with the Stripe Ruby library
+- The corresponding user_id from Stripe is stored locally for easy retrieval
+
+### Create a view to show a user's subscription status
