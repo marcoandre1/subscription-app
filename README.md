@@ -177,14 +177,77 @@ Publication Routes (Non-subscriber):
 rails g model publication title:string description:text file_url:string
 ```
 
-- Migrate the database:
+- Migrate the database to generate the publication model:
 
 ```console
 rake db:migrate
 ```
 
+- Add routes in `config/routes.rb`:
+
+```ruby
+resources :publications, only: [:index, :show]
+```
+
+- Create the `publications_controller.rb` and the `index` and `show` views.
+- To add a publication for test you can type:
+
+```console
+rails c
+p = Publication.new(title: 'My first publication', description: 'This is my first publication', file_url: 'http://myfilelocation.com')
+p.save
+exit
+```
+
 ### Add administrators
+
+- Create a migration file to add the `is_admin` column to the `users` table to allow users to become admin:
+
+```console
+rails g migration add_is_admin_to_users is_admin:boolean
+```
+
+- Modify the generated migration file for `add_is_admin_to_users` to set null to false and default to false.
+
+```ruby
+add_column :users, :is_admin, :boolean, null: false, default: false
+```
+
+- Run the migration:
+
+```console
+rake db:migrate
+```
+
+- You can test everything with the rails console:
+
+```console
+rails c
+User.last
+User.last.is_admin
+User.last.update(is_admin: true)
+```
+
+- If you wish, you can set an admin in the `seeds.rb` (so you have one by default):
+
+```ruby
+User.create(
+  email: 'admin@test.com',
+  password: 'password',
+  is_admin: true
+)
+```
 
 ### Build an administrator view for publications
 
+- Update the `routes.rb` to add the admin routes.
+- Create the `admin_controller.rb` under controllers.
+- Add the `admin` folder under controllers, and add the `publications_controller.rb`.
+- Add the `admin` folder under views and, under `admin` folder, the `publications` folder and add the `index.html.erb`, `edit.html.erb`, `show.html.erb`, `new.html.erb`.
+- Run `rails s` and navigate to `localhost:3000/admin/publications` to test the admin routes.
+
 ### Build a subscriber view for publications
+
+- We already did at `localhost:3000/publications`. You can check that everything works fine.
+
+## Stripe API
