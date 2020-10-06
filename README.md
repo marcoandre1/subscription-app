@@ -271,6 +271,48 @@ User.create(
   - Handles storing credit card information
   - Additional features like coupons and trial periods are also available
 
+- Go to [Stripe]() and open an account.
+- Create a new product in the `Products` section. Example:
+
+> Subscription App Bronze Plan 9.00 $ / month
+
+1. Install Stripe libraries and tools
+
+```ruby
+# If you use bundler, you can add this line to your Gemfile
+gem 'stripe'
+```
+
+- Run `bundle install`
+- Create `config/initializers/stripe.rb` and paste the [Stripe.api_key](https://stripe.com/docs/api/authentication?lang=ruby)
+
+```ruby
+Stripe.api_key = 'XXXXXXXXXXXXXXXXXXXXXX'
+```
+
+- To retrieve the subscription, you need to [retrieve the plan](https://stripe.com/docs/api/plans/retrieve) using the using the [prices API](https://stripe.com/docs/api/prices).
+- You can test that everything is working fine, using the rails console:
+
+```console
+rails c
+Stripe::Price.retrieve('price_XXXXXXXXXXXXXXXXXX')
+exit
+```
+
+> Notice: be sure to use you API key and the price_id of your product.
+
+- To secure a little bit more our API key, we can put it in a (dotenv)[https://github.com/bkeepers/dotenv] file.
+- Add `gem 'dotenv-rails', groups: [:development, :test]` to Gemfile and run `bundle install`
+- Create `.env` file and add `STRIPE_API_KEY="XXXXXXXXXXX"`. Make sure that `.env` is in `.gitignore`.
+- Update `stripe.rb`: `Stripe.api_key = ENV["STRIPE_API_KEY"]`
+- Test again in your console that everything is still working:
+
+```console
+rails c
+Stripe.api_key
+exit
+```
+
 ### Integrate the Stripe library in our application
 
 - Adding Stripe to Our application
@@ -354,6 +396,8 @@ exit
 rails generate controller users info
 ```
 
+- Update `routes.rb`:
+
 ```ruby
 get '/users/info', to: 'users#info'
 ```
@@ -362,6 +406,20 @@ get '/users/info', to: 'users#info'
 
 ```ruby
 before_action :authenticate_user!
+def info
+  @subscription = current_user.subscription
+end
+```
+
+- Update `app/views/users/info.html.erb`:
+
+```html
+<%= current_user.email %>
+<% if @subscription.active %>
+subscribed
+<% else %>
+unsubscribed
+<% end %>
 ```
 
 - Navigate to `localhost:3000/users/info`
