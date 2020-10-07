@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  stripe_user_id: MyString
+  active: false
+  user: one
+
+two:
+  stripe_user_id: MyString
+  active: false
+  user: two

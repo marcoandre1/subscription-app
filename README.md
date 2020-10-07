@@ -329,11 +329,13 @@ exit
 - `active` boolean
 - Stores Stripe user_id for retrieval
 
+- Create the subscription model:
+
 ```console
 rails generate model subscription stripe_user_id:string active:boolean user:references
 ```
 
-- Update `CreateSubscriptions` migration to ensure boolean can't be null and is false by default:
+- Update `create_subscriptions.rb` migration file to ensure `active` can't be null and is false by default:
 
 ```ruby
 t.boolean :active, null: false, default: false
@@ -368,7 +370,7 @@ end
 rails g migration AddSubscriptionToPreviousUsers
 ```
 
-- Update the `AddSubscriptionToPreviousUsers` migration file with the `up` function. More details at [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html):
+- Update the `add_subscription_to_previous_users.rb` migration file with the `up` function. More details at [active record migrations](https://edgeguides.rubyonrails.org/active_record_migrations.html):
 
 ```ruby
 def up
@@ -379,6 +381,10 @@ end
 ```
 
 - Run `rake db:migrate`
+
+> We should see that a subscription is created for every existing user.
+
+- You can also verify with rails console:
 
 ```console
 rails c
