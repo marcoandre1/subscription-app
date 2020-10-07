@@ -254,10 +254,7 @@ User.create(
 
 ### Discuss the payment processor Stripe
 
-- Payment processors:
-
-| PayPal | Authorize.Net | Stripe |
-
+- Payment processors: `PayPal`, `Authorize.Net`, `Stripe`.
 - Why Stripe?
   - PCI compliance is hard
   - Powerful API
@@ -271,7 +268,15 @@ User.create(
   - Handles storing credit card information
   - Additional features like coupons and trial periods are also available
 
-- Go to [Stripe]() and open an account.
+### Integrate the Stripe library in our application
+
+- Adding Stripe to Our application
+  - Add the Stripe API gem
+  - Find our Stripe API keys
+  - Use `dotenv` to securely store API keys
+  - Test the API in the console
+
+- Go to [Stripe](https://stripe.com/en-ca) and open an account.
 - Create a new product in the `Products` section. Example:
 
 > Subscription App Bronze Plan 9.00 $ / month
@@ -287,24 +292,27 @@ gem 'stripe'
 - Create `config/initializers/stripe.rb` and paste the [Stripe.api_key](https://stripe.com/docs/api/authentication?lang=ruby)
 
 ```ruby
-Stripe.api_key = 'XXXXXXXXXXXXXXXXXXXXXX'
+Stripe.api_key = 'sk_test_XXXXXXXXXXXXXXXXXXXXXX'
 ```
 
-- To retrieve the subscription, you need to [retrieve the plan](https://stripe.com/docs/api/plans/retrieve) using the using the [prices API](https://stripe.com/docs/api/prices).
-- You can test that everything is working fine, using the rails console:
+- To retrieve the subscription, you need to [retrieve the plan](https://stripe.com/docs/api/plans/retrieve?lang=ruby) using the [prices API](https://stripe.com/docs/api/prices) ID.
+- You can test that everything works fine using the rails console:
 
 ```console
 rails c
-Stripe::Price.retrieve('price_XXXXXXXXXXXXXXXXXX')
+Stripe::Plan.retrieve('price_XXXXXXXXXXXXXXXXXX')
 exit
 ```
 
-> Notice: be sure to use you API key and the price_id of your product.
+> Notice: be sure to use your `API key` and the `price_id` of your product (if you are logged in, the provided examples should already have your keys and price_id).
 
-- To secure a little bit more our API key, we can put it in a (dotenv)[https://github.com/bkeepers/dotenv] file.
-- Add `gem 'dotenv-rails', groups: [:development, :test]` to Gemfile and run `bundle install`
+### Learn how to securely store configuration keys
+
+- Add `dotenv`. A `.env` file can keep the API keys out of the code.
+- Add the API key in a [dotenv](https://github.com/bkeepers/dotenv) file.
+- Add `gem 'dotenv-rails', groups: [:development, :test]` to Gemfile and run `bundle install`.
 - Create `.env` file and add `STRIPE_API_KEY="XXXXXXXXXXX"`. Make sure that `.env` is in `.gitignore`.
-- Update `stripe.rb`: `Stripe.api_key = ENV["STRIPE_API_KEY"]`
+- Update `stripe.rb`: `Stripe.api_key = ENV["STRIPE_API_KEY"]`.
 - Test again in your console that everything is still working:
 
 ```console
@@ -312,18 +320,6 @@ rails c
 Stripe.api_key
 exit
 ```
-
-### Integrate the Stripe library in our application
-
-- Adding Stripe to Our application
-  - Add the Stripe API gem
-  - Find our Stripe API keys
-  - Use `dotenv` to securely store API keys
-  - Test the API in the console
-
-### Learn how to securely store configuration keys
-
-- Add `dotenv`. A `.env` file can keep the API keys out of the code.
 
 ## Add subscriptions
 
