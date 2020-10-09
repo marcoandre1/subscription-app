@@ -394,17 +394,19 @@ exit
 
 #### Creating the User info Screen
 
+- Generate a users controller as well as the `info` route where users can manage their account information:
+
 ```console
 rails generate controller users info
 ```
 
-- Update `routes.rb`:
+- Update `routes.rb` to indicate the controller's action `users#info`:
 
 ```ruby
 get '/users/info', to: 'users#info'
 ```
 
-- Update `users_controller.rb`:
+- Update `users_controller.rb` to add the devise helper `authenticate_user` and the `@subscription` parameter to use it in the view:
 
 ```ruby
 before_action :authenticate_user!
@@ -413,9 +415,18 @@ def info
 end
 ```
 
-- Update `app/views/users/info.html.erb`:
+- Update `_nav.html.erb` to add a link to `users_info_path`:
 
-```html
+```ruby
+<% if user_signed_in? %>
+<li class="nav-item">
+  <%= link_to current_user.email, users_info_path %>
+</li>
+```
+
+- Update `app/views/users/info.html.erb` to show if the user is `subscribed` or `unsubscribed`:
+
+```ruby
 <%= current_user.email %>
 <% if @subscription.active %>
 subscribed
@@ -424,7 +435,7 @@ unsubscribed
 <% end %>
 ```
 
-- Navigate to `localhost:3000/users/info`
+- Navigate to `localhost:3000/users/info` to see the new changes.
 
 ### Accept credit cards using Stripe.js
 
