@@ -1,25 +1,21 @@
 class UsersController < ApplicationController
+  protect_from_forgery except: [:charge]
   before_action :authenticate_user!
   def info
     @subscription = current_user.subscription
   end
 
   def charge
+    @paymentMethodId = params[:paymentMethodId]
+
     # Create a new customer object
     customer = Stripe::Customer.create(email: current_user.email)
-  
-    # Recommendation: save the customer.id in your database.
-    current_user.subscription.stripe_user_id = customer.id
-    current_user.subscription.save
 
     # Create the subscription
-    content_type 'application/json'
-    data = JSON.parse request.body.read
-  
     begin
       Stripe::PaymentMethod.attach(
-        data['paymentMethodId'],
-        { customer: current_user.subscription.stripe_user_id }
+        @paymentMethodId,
+        { customer: customer.id }
       )
     rescue Stripe::CardError => e
       halt 200,
@@ -29,18 +25,20 @@ class UsersController < ApplicationController
   
     # Set the default payment method on the customer
     Stripe::Customer.update(
-      current_user.subscription.stripe_user_id,
-      invoice_settings: { default_payment_method: data['paymentMethodId'] }
+      customer.id,
+      invoice_settings: { default_payment_method: @paymentMethodId }
     )
   
     # Create the subscription
     subscription =
       Stripe::Subscription.create(
-        customer: current_user.subscription.stripe_user_id,
-        items: [{ price: 'price_HGd7M3DV3IMXkC' }],
+        customer: customer.id,
+        items: [{ price: 'price_1HZ7mCLsjNADwB6O9M8bQoMT' }],
         expand: %w[latest_invoice.payment_intent]
       )
 
+    # Recommendation: save the customer.id in your database.
+    current_user.subscription.stripe_user_id = customer.id
     current_user.subscription.active = true
     current_user.subscription.save
   
