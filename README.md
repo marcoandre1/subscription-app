@@ -447,26 +447,9 @@ unsubscribed
 - Recommended by Stripe
 - Local Subscription model becomes super light-weight
 
-- Update `info.html.erb` to add a partial view when the user is unsubscribed:
-
-```ruby
-<div class="container">
-  <h3>Account for <%= current_user.email %></h3>
-  <% if @subscription.active %>
-  subscribed
-  <% else %>
-    <%= render 'form' %>
-  <% end %>
-</div>
-```
-
-- Create `app/views/users/_form.html.erb` which is the form for Stripe payments:
-
-```html
-
-```
-
 ### Tie a subscription to a user with Stripe API
 
 - Using the Stripe token, we create a subscription with the Stripe Ruby library
 - The corresponding user_id from Stripe is stored locally for easy retrieval
+
+> Have a look at [Create fixed-price subscriptions](https://stripe.com/docs/billing/subscriptions/fixed-price) for subscriptions implementation.

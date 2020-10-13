@@ -5,7 +5,7 @@ let stripe, customer, price, card;
 // ---------------------
 // Set your publishable key: remember to change this to your live publishable key in production
 // See your keys here: https://dashboard.stripe.com/account/apikeys
-stripe = Stripe('pk_test_51HZ7c6LsjNADwB6O3XzS8dxmdtNi7aR5W2Z6GiVM6FJtSdQKbhakDzLB88JLs0bI0S4p7QThxj4Yyx9LvncTv3J100OQ05Bg4I');
+stripe = Stripe('publishable_key');
 let elements = stripe.elements();
 
 // ---------------------
