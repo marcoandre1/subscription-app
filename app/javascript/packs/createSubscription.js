@@ -34,7 +34,7 @@ card.mount('#card-element');
 // ---------------------
 // 3. Validation
 // ---------------------
-card.on('change', function (event) {
+card.on('change', (event) => {
   showCardError(event);
 });
 
@@ -47,13 +47,14 @@ function showCardError(event) {
   }
 }
 
-// --------------------------------------------
-// 4. New subscription and update payment method
-// --------------------------------------------
-let form = document.getElementById('subscription-form');
+// ---------------------------------------------------
+// 4. Save payment details and create the subscription
+// ----------------------------------------------------
+let subscriptionForm = document.getElementById('subscription-form');
 
-form.addEventListener('submit', function (ev) {
+subscriptionForm.addEventListener('submit', function (ev) {
   ev.preventDefault();
+
   // If a previous payment was attempted, get the latest invoice
   const latestInvoicePaymentIntentStatus = localStorage.getItem(
     'latestInvoicePaymentIntentStatus'
@@ -76,7 +77,7 @@ form.addEventListener('submit', function (ev) {
 
 function createPaymentMethod({ card, isPaymentRetry, invoiceId }) {
   // Set up payment method for recurring usage
-  let billingName = document.querySelector('#name').value;
+  let billingName = document.getElementById('name').value;
 
   stripe
     .createPaymentMethod({
@@ -117,7 +118,7 @@ function createSubscription({ paymentMethodId }) {
         'Content-type': 'application/json',
       },
       body: JSON.stringify({
-        paymentMethodId: paymentMethodId
+        paymentMethodId: paymentMethodId,
       }),
     })
       .then((response) => {
@@ -136,7 +137,7 @@ function createSubscription({ paymentMethodId }) {
       .then((result) => {
         return {
           paymentMethodId: paymentMethodId,
-          subscription: result
+          subscription: result,
         };
       })
       // Some payment methods require a customer to be on session
@@ -166,10 +167,13 @@ function onSubscriptionComplete(result) {
     // Change your UI to show a success message to your customer.
     // Call your backend to grant access to your service based on
     // `result.subscription.items.data[0].price.product` the customer subscribed to.
+    window.location.href = 'info';
   }
 }
 
-
+// ----------------------------------------------
+// 7.
+// ----------------------------------------------
 function handlePaymentThatRequiresCustomerAction({
   subscription,
   invoice,
@@ -223,7 +227,9 @@ function handlePaymentThatRequiresCustomerAction({
   }
 }
 
-
+// ------------------------------------------
+// 8. 
+// ------------------------------------------
 function handleRequiresPaymentMethod({
   subscription,
   paymentMethodId,

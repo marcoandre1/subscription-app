@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   end
 
   def charge
-    @paymentMethodId = params[:paymentMethodId]
+    paymentMethodId = params["paymentMethodId"]
 
     # Create a new customer object
     customer = Stripe::Customer.create(email: current_user.email)
@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     # Create the subscription
     begin
       Stripe::PaymentMethod.attach(
-        @paymentMethodId,
+        paymentMethodId,
         { customer: customer.id }
       )
     rescue Stripe::CardError => e
@@ -26,7 +26,7 @@ class UsersController < ApplicationController
     # Set the default payment method on the customer
     Stripe::Customer.update(
       customer.id,
-      invoice_settings: { default_payment_method: @paymentMethodId }
+      invoice_settings: { default_payment_method: paymentMethodId }
     )
   
     # Create the subscription
@@ -41,7 +41,7 @@ class UsersController < ApplicationController
     current_user.subscription.stripe_user_id = customer.id
     current_user.subscription.active = true
     current_user.subscription.save
-  
+    
     redirect_to users_info_path
   end
 end
